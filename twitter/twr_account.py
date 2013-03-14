@@ -54,8 +54,8 @@ class TwrAccount:
         return signature
 
     @classmethod
-    def authorization_header(cls, method, url):
-        params = {
+    def authorization_header(cls, method, url, request_params):
+        oauth_params = {
             'oauth_nonce': TwrAccount._nonce(),
             'oauth_timestamp': TwrAccount._timestamp(),
             'oauth_consumer_key': cls._consumer_key,
@@ -63,6 +63,7 @@ class TwrAccount:
             'oauth_token': cls._access_key,
             'oauth_signature_method': 'HMAC-SHA1'}
 
+        params = dict(oauth_params.items() + request_params)
         params['oauth_signature'] = cls._oauth_signature(method, url, params)
 
         header = 'OAuth %s' % ', '.join(['%s="%s"' % \
