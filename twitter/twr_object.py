@@ -37,12 +37,9 @@ class TwrObject(GObject.GObject):
         'transfer-failed': (GObject.SignalFlags.RUN_FIRST, None, ([str])),
         'transfer-started': (GObject.SignalFlags.RUN_FIRST, None, ([]))}
 
-    def __init__(self):
-        GObject.GObject.__init__(self)
-
-    def _gen_header(self, method, url):
-        authorization = TwrAccount.authorization_header(method, url)
-        headers = ['Host: api.twitter.com:443',
+    def _gen_header(self, method, url, params=[]):
+        authorization = TwrAccount.authorization_header(method, url, params)
+        headers = ['Host: api.twitter.com',
                    'Authorization: %s' % authorization]
 
         return headers
@@ -79,16 +76,21 @@ class TwrObject(GObject.GObject):
 
     def request(self, method, url, params, filepath=None):
         c = pycurl.Curl()
-        c.setopt(c.HTTPHEADER, self._gen_header(method, url))
 
         if method == 'POST':
             c.setopt(c.POST, 1)
+            c.setopt(c.HTTPHEADER, self._gen_header(method, url))
 
             if filepath is not None:
                 params += [("media", (c.FORM_FILE, filepath))]
-            c.setopt(c.HTTPPOST, params)
+
+            if params is not None:
+                c.setopt(c.HTTPPOST, params)
+            else:
+                c.setopt(c.POSTFIELDS, '')
         else:
-            c.setopt(c.HTTPGET,  1)
+            c.setopt(c.HTTPGET, 1)
+            c.setopt(c.HTTPHEADER, self._gen_header(method, url, params))
             url += '?%s' % urllib.urlencode(params)
 
         # XXX hack to trace transfer states
@@ -102,16 +104,15 @@ class TwrObject(GObject.GObject):
         c.setopt(c.NOPROGRESS, 0)
         c.setopt(c.PROGRESSFUNCTION, pre_update_cb)
         c.setopt(c.WRITEFUNCTION, self._write_cb)
+        #c.setopt(c.VERBOSE, True)
 
         try:
             c.perform()
-        except pycurl.error:
-            message = 'Something went wrong'
-            self.emit('transfer-failed', message)
+        except pycurl.error, e:
+            self.emit('transfer-failed', str(e))
         else:
             code = c.getinfo(c.HTTP_CODE)
             if code != 200:
-                message = 'HTTP code %s' % code
-                self.emit('transfer-failed', message)
+                self.emit('transfer-failed', 'HTTP code %s' % code)
         finally:
             c.close()
