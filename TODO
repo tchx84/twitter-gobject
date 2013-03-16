@@ -1,2 +1,5 @@
 [DONE]- Add higher level classes, ie: TwrStatus
 [DONE]- Publish tests
+[    ]- Add helper class method
+[    ]- Add oauth token-request process
+[    ]- Add TwrTimeline class and proper helpers.
