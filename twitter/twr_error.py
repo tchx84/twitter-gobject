@@ -35,3 +35,7 @@ class TwrStatusNotFound(Exception):
 
 class TwrStatusError(Exception):
     pass
+
+
+class TwrTimelineError(Exception):
+    pass
