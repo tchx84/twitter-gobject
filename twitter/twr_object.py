@@ -71,9 +71,6 @@ class TwrObject(GObject.GObject):
         if total == done and state in states and len(states) == state + 1:
             states.append(state + 1)
 
-    def _write_cb(self, buffer):
-        self.emit('transfer-completed', buffer)
-
     def request(self, method, url, params, filepath=None):
         c = pycurl.Curl()
 
@@ -100,10 +97,16 @@ class TwrObject(GObject.GObject):
             args = list(args) + [states]
             self._update_cb(*args)
 
+        #XXX hack to write multiple responses
+        buffer = []
+
+        def __write_cb(data):
+            buffer.append(data)
+
         c.setopt(c.URL, url)
         c.setopt(c.NOPROGRESS, 0)
         c.setopt(c.PROGRESSFUNCTION, pre_update_cb)
-        c.setopt(c.WRITEFUNCTION, self._write_cb)
+        c.setopt(c.WRITEFUNCTION, __write_cb)
         #c.setopt(c.VERBOSE, True)
 
         try:
@@ -115,4 +118,5 @@ class TwrObject(GObject.GObject):
             if code != 200:
                 self.emit('transfer-failed', 'HTTP code %s' % code)
         finally:
+            self.emit('transfer-completed', ''.join(buffer))
             c.close()
