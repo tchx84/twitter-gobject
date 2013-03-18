@@ -43,3 +43,7 @@ class TwrTimelineError(Exception):
 
 class TwrOauthError(Exception):
     pass
+
+
+class TwrSearchError(Exception):
+    pass
