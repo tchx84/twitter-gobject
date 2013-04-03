@@ -1,6 +1,6 @@
 [DONE]- Add higher level classes, ie: TwrStatus
 [DONE]- Publish tests
-[    ]- Add Twr* classes helpers.
+[DONE]- Add Twr* classes helpers.
 [DONE]- Add oauth token-request process
 [DONE]- Add TwrTimeline class.
-[    ]- Refactor Twr* around TwrObject class
+[DONE]- Refactor Twr* around TwrObject class
