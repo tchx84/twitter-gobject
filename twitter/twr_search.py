@@ -20,23 +20,22 @@
 #OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 #THE SOFTWARE.
 
-import json
-
 from gi.repository import GObject
 
 import twr_error
 from twr_object import TwrObject
+from twr_object_helper import TwrObjectHelper
 
 
-class TwrSearch(GObject.GObject):
+class TwrSearch(TwrObject):
 
     TWEETS_URL = 'https://api.twitter.com/1.1/search/tweets.json'
 
     __gsignals__ = {
         'tweets-downloaded':        (GObject.SignalFlags.RUN_FIRST,
-                                    None, ([object])),
+                                     None, ([object])),
         'tweets-downloaded-failed': (GObject.SignalFlags.RUN_FIRST,
-                                    None, ([str]))}
+                                     None, ([str]))}
 
     def tweets(self, q, count=None, since_id=None, max_id=None):
         params = [('q', (q))]
@@ -48,32 +47,11 @@ class TwrSearch(GObject.GObject):
         if max_id is not None:
             params += [('max_id', (max_id))]
 
-        GObject.idle_add(self._get,
-                        self.TWEETS_URL,
-                        params,
-                        self.__completed_cb,
-                        self.__failed_cb,
-                        'tweets-downloaded',
-                        'tweets-downloaded-failed')
-
-    def _get(self, url, params, completed_cb, failed_cb,
-            completed_data, failed_data):
-
-        object = TwrObject()
-        object.connect('transfer-completed', completed_cb, completed_data)
-        object.connect('transfer-failed', failed_cb, failed_data)
-        object.request('GET', url, params)
-
-    def __completed_cb(self, object, data, signal):
-        try:
-            info = json.loads(data)
-
-            if isinstance(info, dict) and ('errors' in info.keys()):
-                raise twr_error.TwrSearchError(str(info['errors']))
-
-            self.emit(signal, info)
-        except Exception, e:
-            print 'TwrSearch.__completed_cb crashed with %s' % str(e)
-
-    def __failed_cb(self, object, message, signal):
-        self.emit(signal, message)
+        GObject.idle_add(TwrObjectHelper.get,
+                         self,
+                         self.TWEETS_URL,
+                         params,
+                         TwrObjectHelper._completed_cb,
+                         TwrObjectHelper._failed_cb,
+                         'tweets-downloaded',
+                         'tweets-downloaded-failed')

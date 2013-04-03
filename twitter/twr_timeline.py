@@ -20,12 +20,11 @@
 #OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 #THE SOFTWARE.
 
-import json
-
 from gi.repository import GObject
 
 import twr_error
 from twr_object import TwrObject
+from twr_object_helper import TwrObjectHelper
 
 
 class TwrTimeline(TwrObject):
@@ -37,39 +36,41 @@ class TwrTimeline(TwrObject):
 
     __gsignals__ = {
         'mentions-downloaded':          (GObject.SignalFlags.RUN_FIRST,
-                                        None, ([object])),
+                                         None, ([object])),
         'mentions-downloaded-failed':   (GObject.SignalFlags.RUN_FIRST,
-                                        None, ([str])),
+                                         None, ([str])),
         'timeline-downloaded':          (GObject.SignalFlags.RUN_FIRST,
-                                        None, ([object])),
+                                         None, ([object])),
         'timeline-downloaded-failed':   (GObject.SignalFlags.RUN_FIRST,
-                                        None, ([str]))}
+                                         None, ([str]))}
 
     def mentions_timeline(self, count=None, since_id=None, max_id=None):
         params = self._params(count, since_id, max_id)
 
-        GObject.idle_add(self._get,
-                        self.MENTIONS_TIMELINE_URL,
-                        params,
-                        self.__completed_cb,
-                        self.__failed_cb,
-                        'mentions-downloaded',
-                        'mentions-downloaded-failed')
+        GObject.idle_add(TwrObjectHelper.get,
+                         self,
+                         self.MENTIONS_TIMELINE_URL,
+                         params,
+                         TwrObjectHelper._completed_cb,
+                         TwrObjectHelper._failed_cb,
+                         'mentions-downloaded',
+                         'mentions-downloaded-failed')
 
     def home_timeline(self, count=None, since_id=None,
                       max_id=None, exclude_replies=None):
         params = self._params(count, since_id, max_id, exclude_replies)
 
-        GObject.idle_add(self._get,
-                        self.HOME_TIMELINE_URL,
-                        params,
-                        self.__completed_cb,
-                        self.__failed_cb,
-                        'timeline-downloaded',
-                        'timeline-downloaded-failed')
+        GObject.idle_add(TwrObjectHelper.get,
+                         self,
+                         self.HOME_TIMELINE_URL,
+                         params,
+                         TwrObjectHelper._completed_cb,
+                         TwrObjectHelper._failed_cb,
+                         'timeline-downloaded',
+                         'timeline-downloaded-failed')
 
     def _params(self, count=None, since_id=None,
-                      max_id=None, exclude_replies=None):
+                max_id=None, exclude_replies=None):
         params = []
 
         if count is not None:
@@ -82,25 +83,3 @@ class TwrTimeline(TwrObject):
             params += [('exclude_replies', (exclude_replies))]
 
         return params
-
-    def _get(self, url, params, completed_cb, failed_cb,
-            completed_data, failed_data):
-
-        object = TwrObject()
-        object.connect('transfer-completed', completed_cb, completed_data)
-        object.connect('transfer-failed', failed_cb, failed_data)
-        object.request('GET', url, params)
-
-    def __completed_cb(self, object, data, signal):
-        try:
-            info = json.loads(data)
-
-            if isinstance(info, dict) and ('errors' in info.keys()):
-                raise twr_error.TwrTimelineError(str(info['errors']))
-
-            self.emit(signal, info)
-        except Exception, e:
-            print 'TwrTimeline.__completed_cb crashed with %s' % str(e)
-
-    def __failed_cb(self, object, message, signal):
-        self.emit(signal, message)

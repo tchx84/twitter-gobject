@@ -33,17 +33,5 @@ class TwrStatusNotFound(Exception):
     pass
 
 
-class TwrStatusError(Exception):
-    pass
-
-
-class TwrTimelineError(Exception):
-    pass
-
-
-class TwrOauthError(Exception):
-    pass
-
-
-class TwrSearchError(Exception):
+class TwrObjectError(Exception):
     pass

@@ -25,9 +25,10 @@ from urlparse import parse_qsl
 
 import twr_error
 from twr_object import TwrObject
+from twr_object_helper import TwrObjectHelper
 
 
-class TwrOauth(GObject.GObject):
+class TwrOauth(TwrObject):
 
     REQUEST_TOKEN_URL = 'https://api.twitter.com/oauth/request_token'
     AUTHORIZATION_URL = 'https://api.twitter.com/oauth/'\
@@ -35,63 +36,47 @@ class TwrOauth(GObject.GObject):
     ACCESS_TOKEN_URL = 'https://api.twitter.com/oauth/access_token'
 
     __gsignals__ = {
-        'request-downloaded':       (GObject.SignalFlags.RUN_FIRST,
-                                    None, ([object])),
+        'request-downloaded':        (GObject.SignalFlags.RUN_FIRST,
+                                      None, ([object])),
         'request-downloaded-failed': (GObject.SignalFlags.RUN_FIRST,
-                                    None, ([str])),
-        'access-downloaded':        (GObject.SignalFlags.RUN_FIRST,
-                                    None, ([object])),
-        'access-downloaded-failed': (GObject.SignalFlags.RUN_FIRST,
-                                    None, ([str]))}
+                                      None, ([str])),
+        'access-downloaded':         (GObject.SignalFlags.RUN_FIRST,
+                                      None, ([object])),
+        'access-downloaded-failed':  (GObject.SignalFlags.RUN_FIRST,
+                                      None, ([str]))}
 
     def request_token(self):
-        GObject.idle_add(self._get,
-                        self.REQUEST_TOKEN_URL,
-                        [],
-                        self.__completed_cb,
-                        self.__failed_cb,
-                        'request-downloaded',
-                        'request-downloaded-failed')
+        GObject.idle_add(TwrObjectHelper.get,
+                         self,
+                         self.REQUEST_TOKEN_URL,
+                         [],
+                         self._completed_cb,
+                         TwrObjectHelper._failed_cb,
+                         'request-downloaded',
+                         'request-downloaded-failed')
 
     def access_token(self, verifier):
         params = [('oauth_callback', ('oob')),
                   ('oauth_verifier', (verifier))]
 
-        GObject.idle_add(self._post,
-                        self.ACCESS_TOKEN_URL,
-                        params,
-                        None,
-                        self.__completed_cb,
-                        self.__failed_cb,
-                        'access-downloaded',
-                        'access-downloaded-failed')
+        GObject.idle_add(TwrObjectHelper.post,
+                         self,
+                         self.ACCESS_TOKEN_URL,
+                         params,
+                         None,
+                         self._completed_cb,
+                         TwrObjectHelper._failed_cb,
+                         'access-downloaded',
+                         'access-downloaded-failed')
 
-    def _get(self, url, params,
-            completed_cb, failed_cb, completed_data, failed_data):
-
-        object = TwrObject()
-        object.connect('transfer-completed', completed_cb, completed_data)
-        object.connect('transfer-failed', failed_cb, failed_data)
-        object.request('GET', url, params)
-
-    def _post(self, url, params, filepath,
-            completed_cb, failed_cb, completed_data, failed_data):
-
-        object = TwrObject()
-        object.connect('transfer-completed', completed_cb, completed_data)
-        object.connect('transfer-failed', failed_cb, failed_data)
-        object.request('POST', url, params, filepath)
-
-    def __completed_cb(self, object, data, signal):
+    def _completed_cb(self, object, data, signal):
         try:
             info = dict(parse_qsl(data))
 
             if isinstance(info, dict) and ('errors' in info.keys()):
-                raise twr_error.TwrOauthError(str(info['errors']))
+                message = '%s: %s' % (instance.__class__, str(info['errors']))
+                raise twr_error.TwrObjectError(message)
 
             self.emit(signal, info)
         except Exception, e:
-            print 'TwrOauth.__completed_cb crashed with %s' % str(e)
-
-    def __failed_cb(self, object, message, signal):
-        self.emit(signal, message)
+            print 'TwrOauth: _completed_cb crashed with %s' % str(e)

@@ -32,7 +32,7 @@ class TwrObject(GObject.GObject):
 
     __gsignals__ = {
         'transfer-completed': (GObject.SignalFlags.RUN_FIRST, None, ([str])),
-        'transfer-progress': (GObject.SignalFlags.RUN_FIRST, None, \
+        'transfer-progress': (GObject.SignalFlags.RUN_FIRST, None,
                              ([float, float, str])),
         'transfer-failed': (GObject.SignalFlags.RUN_FIRST, None, ([str])),
         'transfer-started': (GObject.SignalFlags.RUN_FIRST, None, ([]))}
