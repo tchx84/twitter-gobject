@@ -47,10 +47,21 @@ def __phase1_failed_cb(oauth, info):
 
 
 def __phase2_cb(oauth, info):
-    print '[OK] phase2: access-downloaded, with %s' % info
+    print '[OK] phase2: access-downloaded.'
 
     TwrAccount.set_secrets(consumer_key, consumer_secret,
                            info['oauth_token'], info['oauth_token_secret'])
+
+    message = '''
+    Replace these values to run the remaining tests:
+    consumer_key = \'%s\'
+    consumer_secret = \'%s\'
+    access_key = \'%s\'
+    access_secret = \'%s\'
+    '''
+    print message % (consumer_key, consumer_secret,
+                     info['oauth_token'], info['oauth_token_secret'])
+
     loop.quit()
 
 
