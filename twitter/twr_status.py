@@ -17,11 +17,10 @@
 
 from gi.repository import GObject
 
-from twr_object import TwrObject
-from twr_object_helper import TwrObjectHelper
+from twr_object_plus import TwrObjectPlus
 
 
-class TwrStatus(TwrObject):
+class TwrStatus(TwrObjectPlus):
     UPDATE_URL = 'https://api.twitter.com/1.1/statuses/update.json'
     UPDATE_WITH_MEDIA_URL = 'https://api.twitter.com/1.1/statuses/'\
                             'update_with_media.json'
@@ -53,7 +52,7 @@ class TwrStatus(TwrObject):
                                        None, ([str]))}
 
     def __init__(self, status_id=None):
-        TwrObject.__init__(self)
+        TwrObjectPlus.__init__(self)
         self._status_id = status_id
 
     def update(self, status, reply_status_id=None):
@@ -75,59 +74,54 @@ class TwrStatus(TwrObject):
         if reply_status_id is not None:
             params += [('in_reply_to_status_id', (reply_status_id))]
 
-        GObject.idle_add(TwrObjectHelper.post,
-                         self,
+        GObject.idle_add(self.post,
                          url,
                          params,
                          filepath,
-                         TwrObjectHelper._completed_cb,
-                         TwrObjectHelper._failed_cb,
+                         self._completed_cb,
+                         self._failed_cb,
                          'status-updated',
                          'status-updated-failed')
 
     def show(self):
         self._check_is_created()
-        GObject.idle_add(TwrObjectHelper.get,
-                         self,
+        GObject.idle_add(self.get,
                          self.SHOW_URL,
                          [('id', (self._status_id))],
-                         TwrObjectHelper._completed_cb,
-                         TwrObjectHelper._failed_cb,
+                         self._completed_cb,
+                         self._failed_cb,
                          'status-downloaded',
                          'status-downloaded-failed')
 
     def destroy(self):
         self._check_is_created()
-        GObject.idle_add(TwrObjectHelper.post,
-                         self,
+        GObject.idle_add(self.post,
                          self.DESTROY_URL % self._status_id,
                          None,
                          None,
-                         TwrObjectHelper._completed_cb,
-                         TwrObjectHelper._failed_cb,
+                         self._completed_cb,
+                         self._failed_cb,
                          'status-destroyed',
                          'status-destroyed-failed')
 
     def retweet(self):
         self._check_is_created()
-        GObject.idle_add(TwrObjectHelper.post,
-                         self,
+        GObject.idle_add(self.post,
                          self.RETWEET_URL % self._status_id,
                          None,
                          None,
-                         TwrObjectHelper._completed_cb,
-                         TwrObjectHelper._failed_cb,
+                         self._completed_cb,
+                         self._failed_cb,
                          'retweet-created',
                          'retweet-created-failed')
 
     def retweets(self):
         self._check_is_created()
-        GObject.idle_add(TwrObjectHelper.get,
-                         self,
+        GObject.idle_add(self.get,
                          self.RETWEETS_URL % self._status_id,
                          [],
-                         TwrObjectHelper._completed_cb,
-                         TwrObjectHelper._failed_cb,
+                         self._completed_cb,
+                         self._failed_cb,
                          'retweets-downloaded',
                          'retweets-downloaded-failed')
 

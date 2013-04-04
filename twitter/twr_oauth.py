@@ -19,14 +19,13 @@ from gi.repository import GObject
 from urlparse import parse_qsl
 
 import twr_error
-from twr_object import TwrObject
-from twr_object_helper import TwrObjectHelper
+from twr_object_plus import TwrObjectPlus
 
 
-class TwrOauth(TwrObject):
+class TwrOauth(TwrObjectPlus):
 
     REQUEST_TOKEN_URL = 'https://api.twitter.com/oauth/request_token'
-    AUTHORIZATION_URL = 'https://api.twitter.com/oauth/'\
+    AUTHORIZATION_URL = 'https://api.twitter.com/oauth/' \
                         'authorize?oauth_token=%s'
     ACCESS_TOKEN_URL = 'https://api.twitter.com/oauth/access_token'
 
@@ -41,12 +40,11 @@ class TwrOauth(TwrObject):
                                       None, ([str]))}
 
     def request_token(self):
-        GObject.idle_add(TwrObjectHelper.get,
-                         self,
+        GObject.idle_add(self.get,
                          self.REQUEST_TOKEN_URL,
                          [],
                          self._completed_cb,
-                         TwrObjectHelper._failed_cb,
+                         self._failed_cb,
                          'request-downloaded',
                          'request-downloaded-failed')
 
@@ -54,13 +52,12 @@ class TwrOauth(TwrObject):
         params = [('oauth_callback', ('oob')),
                   ('oauth_verifier', (verifier))]
 
-        GObject.idle_add(TwrObjectHelper.post,
-                         self,
+        GObject.idle_add(self.post,
                          self.ACCESS_TOKEN_URL,
                          params,
                          None,
                          self._completed_cb,
-                         TwrObjectHelper._failed_cb,
+                         self._failed_cb,
                          'access-downloaded',
                          'access-downloaded-failed')
 
@@ -69,7 +66,7 @@ class TwrOauth(TwrObject):
             info = dict(parse_qsl(data))
 
             if isinstance(info, dict) and ('errors' in info.keys()):
-                message = '%s: %s' % (instance.__class__, str(info['errors']))
+                message = '%s: %s' % ('TwrOauth', str(info['errors']))
                 raise twr_error.TwrObjectError(message)
 
             self.emit(signal, info)

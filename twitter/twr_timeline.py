@@ -17,11 +17,10 @@
 
 from gi.repository import GObject
 
-from twr_object import TwrObject
-from twr_object_helper import TwrObjectHelper
+from twr_object_plus import TwrObjectPlus
 
 
-class TwrTimeline(TwrObject):
+class TwrTimeline(TwrObjectPlus):
 
     MENTIONS_TIMELINE_URL = 'https://api.twitter.com/1.1/statuses/'\
                             'mentions_timeline.json'
@@ -41,12 +40,11 @@ class TwrTimeline(TwrObject):
     def mentions_timeline(self, count=None, since_id=None, max_id=None):
         params = self._params(count, since_id, max_id)
 
-        GObject.idle_add(TwrObjectHelper.get,
-                         self,
+        GObject.idle_add(self.get,
                          self.MENTIONS_TIMELINE_URL,
                          params,
-                         TwrObjectHelper._completed_cb,
-                         TwrObjectHelper._failed_cb,
+                         self._completed_cb,
+                         self._failed_cb,
                          'mentions-downloaded',
                          'mentions-downloaded-failed')
 
@@ -54,12 +52,11 @@ class TwrTimeline(TwrObject):
                       max_id=None, exclude_replies=None):
         params = self._params(count, since_id, max_id, exclude_replies)
 
-        GObject.idle_add(TwrObjectHelper.get,
-                         self,
+        GObject.idle_add(self.get,
                          self.HOME_TIMELINE_URL,
                          params,
-                         TwrObjectHelper._completed_cb,
-                         TwrObjectHelper._failed_cb,
+                         self._completed_cb,
+                         self._failed_cb,
                          'timeline-downloaded',
                          'timeline-downloaded-failed')
 

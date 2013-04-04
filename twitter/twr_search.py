@@ -17,11 +17,10 @@
 
 from gi.repository import GObject
 
-from twr_object import TwrObject
-from twr_object_helper import TwrObjectHelper
+from twr_object_plus import TwrObjectPlus
 
 
-class TwrSearch(TwrObject):
+class TwrSearch(TwrObjectPlus):
 
     TWEETS_URL = 'https://api.twitter.com/1.1/search/tweets.json'
 
@@ -41,11 +40,10 @@ class TwrSearch(TwrObject):
         if max_id is not None:
             params += [('max_id', (max_id))]
 
-        GObject.idle_add(TwrObjectHelper.get,
-                         self,
+        GObject.idle_add(self.get,
                          self.TWEETS_URL,
                          params,
-                         TwrObjectHelper._completed_cb,
-                         TwrObjectHelper._failed_cb,
+                         self._completed_cb,
+                         self._failed_cb,
                          'tweets-downloaded',
                          'tweets-downloaded-failed')
