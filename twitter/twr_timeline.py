@@ -22,9 +22,9 @@ from twr_object_plus import TwrObjectPlus
 
 class TwrTimeline(TwrObjectPlus):
 
-    MENTIONS_TIMELINE_URL = 'https://api.twitter.com/1.1/statuses/'\
+    MENTIONS_TIMELINE_URL = 'https://api.twitter.com/1.1/statuses/' \
                             'mentions_timeline.json'
-    HOME_TIMELINE_URL = 'https://api.twitter.com/1.1/statuses/'\
+    HOME_TIMELINE_URL = 'https://api.twitter.com/1.1/statuses/' \
                         'home_timeline.json'
 
     __gsignals__ = {

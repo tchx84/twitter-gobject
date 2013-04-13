@@ -22,7 +22,7 @@ from twr_object_plus import TwrObjectPlus
 
 class TwrStatus(TwrObjectPlus):
     UPDATE_URL = 'https://api.twitter.com/1.1/statuses/update.json'
-    UPDATE_WITH_MEDIA_URL = 'https://api.twitter.com/1.1/statuses/'\
+    UPDATE_WITH_MEDIA_URL = 'https://api.twitter.com/1.1/statuses/' \
                             'update_with_media.json'
     SHOW_URL = 'https://api.twitter.com/1.1/statuses/show.json'
     RETWEET_URL = 'https://api.twitter.com/1.1/statuses/retweet/%s.json'
