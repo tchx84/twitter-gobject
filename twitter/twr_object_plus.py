@@ -45,19 +45,24 @@ class TwrObjectPlus(TwrObject):
         try:
             info = json.loads(data)
 
-            if isinstance(info, dict) and ('errors' in info.keys()):
-                message = '%s: %s' % \
-                    (self.__class__.__name__, str(info['errors']))
-                raise twr_error.TwrObjectError(message)
-
-            # XXX hmmm, hacks we do for love.
-            if hasattr(self, '_status_id') and 'id_str' in info.keys():
-                self._status_id = str(info['id_str'])
+            if isinstance(info, dict):
+                self._check_errors(info)
+                self._check_hacks(info)
 
             self.emit(signal, info)
         except Exception, e:
             print '%s: _completed_cb crashed with %s' % \
                 (self.__class__.__name__, str(e))
+
+    def _check_errors(self, info):
+        if 'errors' in info.keys():
+            message = '%s: %s' % (self.__class__.__name__, str(info['errors']))
+            raise twr_error.TwrObjectError(message)
+
+    # XXX hmmm, hacks we do for love.
+    def _check_hacks(self, info):
+        if hasattr(self, '_status_id') and 'id_str' in info.keys():
+            self._status_id = str(info['id_str'])
 
     def _failed_cb(self, object, message, signal):
         self.emit(signal, message)
