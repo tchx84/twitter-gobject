@@ -43,8 +43,6 @@ class TwrOauth(TwrObjectPlus):
         GObject.idle_add(self.get,
                          self.REQUEST_TOKEN_URL,
                          [],
-                         self._completed_cb,
-                         self._failed_cb,
                          'request-downloaded',
                          'request-downloaded-failed')
 
@@ -56,8 +54,6 @@ class TwrOauth(TwrObjectPlus):
                          self.ACCESS_TOKEN_URL,
                          params,
                          None,
-                         self._completed_cb,
-                         self._failed_cb,
                          'access-downloaded',
                          'access-downloaded-failed')
 

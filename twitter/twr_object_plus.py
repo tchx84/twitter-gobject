@@ -23,24 +23,20 @@ from twr_object import TwrObject
 
 class TwrObjectPlus(TwrObject):
 
-    def get(self, url, params,
-            completed_cb, failed_cb, completed_data, failed_data):
-
+    def get(self, url, params, completed_data, failed_data):
         completed_id = self.connect('transfer-completed',
-                                    completed_cb, completed_data)
+                                    self._completed_cb, completed_data)
         failed_id = self.connect('transfer-failed',
-                                 failed_cb, failed_data)
+                                 self._failed_cb, failed_data)
         self.request('GET', url, params)
         self.disconnect(completed_id)
         self.disconnect(failed_id)
 
-    def post(self, url, params, filepath,
-             completed_cb, failed_cb, completed_data, failed_data):
-
+    def post(self, url, params, filepath, completed_data, failed_data):
         completed_id = self.connect('transfer-completed',
-                                    completed_cb, completed_data)
+                                    self._completed_cb, completed_data)
         failed_id = self.connect('transfer-failed',
-                                 failed_cb, failed_data)
+                                 self._failed_cb, failed_data)
         self.request('POST', url, params, filepath)
         self.disconnect(completed_id)
         self.disconnect(failed_id)

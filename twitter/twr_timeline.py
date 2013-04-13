@@ -43,8 +43,6 @@ class TwrTimeline(TwrObjectPlus):
         GObject.idle_add(self.get,
                          self.MENTIONS_TIMELINE_URL,
                          params,
-                         self._completed_cb,
-                         self._failed_cb,
                          'mentions-downloaded',
                          'mentions-downloaded-failed')
 
@@ -55,8 +53,6 @@ class TwrTimeline(TwrObjectPlus):
         GObject.idle_add(self.get,
                          self.HOME_TIMELINE_URL,
                          params,
-                         self._completed_cb,
-                         self._failed_cb,
                          'timeline-downloaded',
                          'timeline-downloaded-failed')
 

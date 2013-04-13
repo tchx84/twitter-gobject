@@ -78,8 +78,6 @@ class TwrStatus(TwrObjectPlus):
                          url,
                          params,
                          filepath,
-                         self._completed_cb,
-                         self._failed_cb,
                          'status-updated',
                          'status-updated-failed')
 
@@ -88,8 +86,6 @@ class TwrStatus(TwrObjectPlus):
         GObject.idle_add(self.get,
                          self.SHOW_URL,
                          [('id', (self._status_id))],
-                         self._completed_cb,
-                         self._failed_cb,
                          'status-downloaded',
                          'status-downloaded-failed')
 
@@ -99,8 +95,6 @@ class TwrStatus(TwrObjectPlus):
                          self.DESTROY_URL % self._status_id,
                          None,
                          None,
-                         self._completed_cb,
-                         self._failed_cb,
                          'status-destroyed',
                          'status-destroyed-failed')
 
@@ -110,8 +104,6 @@ class TwrStatus(TwrObjectPlus):
                          self.RETWEET_URL % self._status_id,
                          None,
                          None,
-                         self._completed_cb,
-                         self._failed_cb,
                          'retweet-created',
                          'retweet-created-failed')
 
@@ -120,8 +112,6 @@ class TwrStatus(TwrObjectPlus):
         GObject.idle_add(self.get,
                          self.RETWEETS_URL % self._status_id,
                          [],
-                         self._completed_cb,
-                         self._failed_cb,
                          'retweets-downloaded',
                          'retweets-downloaded-failed')
 

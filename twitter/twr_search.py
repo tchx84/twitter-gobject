@@ -43,7 +43,5 @@ class TwrSearch(TwrObjectPlus):
         GObject.idle_add(self.get,
                          self.TWEETS_URL,
                          params,
-                         self._completed_cb,
-                         self._failed_cb,
                          'tweets-downloaded',
                          'tweets-downloaded-failed')
