@@ -16,6 +16,7 @@
 # MA 02110-1301 USA.
 
 import json
+import logging
 
 import twr_error
 from twr_object import TwrObject
@@ -51,8 +52,8 @@ class TwrObjectPlus(TwrObject):
 
             self.emit(signal, info)
         except Exception, e:
-            print '%s: _completed_cb crashed with %s' % \
-                (self.__class__.__name__, str(e))
+            logging.error('%s: _completed_cb crashed with %s',
+                          self.__class__.__name__, str(e))
 
     def _check_errors(self, info):
         if 'errors' in info.keys():

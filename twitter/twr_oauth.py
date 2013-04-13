@@ -15,6 +15,8 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 # MA 02110-1301 USA.
 
+import logging
+
 from gi.repository import GObject
 from urlparse import parse_qsl
 
@@ -67,4 +69,5 @@ class TwrOauth(TwrObjectPlus):
 
             self.emit(signal, info)
         except Exception, e:
-            print 'TwrOauth: _completed_cb crashed with %s' % str(e)
+            logging.error('TwrOauth: _completed_cb crashed with %s',
+                          str(e))
