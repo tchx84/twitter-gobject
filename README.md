@@ -1,5 +1,4 @@
-twitter-gobject
-===============
+# twitter-gobject
 twitter-gobject allows you access Twitter's 1.1 REST API via
 a set of GObject based objects for easy integration with your
 GLib2 based code.
