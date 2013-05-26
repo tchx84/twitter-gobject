@@ -17,6 +17,7 @@
 
 from gi.repository import GObject
 
+import twr_error
 from twr_object_plus import TwrObjectPlus
 
 
